@@ -75,5 +75,9 @@ crashlytics-build.properties
 /[Aa]ssets/*
 !/[Aa]ssets/Resources/
 !/[Aa]ssets/Scenes/
+!/[Aa]ssets/Scripts/
+!/[Aa]ssets/Prefabs/
 
 /OVRAssetBundles/
+
+build_*/
