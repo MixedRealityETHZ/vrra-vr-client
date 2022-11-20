@@ -10,8 +10,10 @@ public class MenuPose : MonoBehaviour
     [SerializeField] private GameObject _menu;
     [SerializeField] private float _distance = .08f;
     [SerializeField] private float _offset = .1f;
+    [SerializeField] private float _closeDelay = 1f;
 
     private HandRef _handAnchor = null;
+    private Coroutine _coroutine = null;
 
     // Start is called before the first frame update
     void Start()
@@ -26,12 +28,24 @@ public class MenuPose : MonoBehaviour
 
     private void Pose_WhenUnselected()
     {
+        _coroutine = StartCoroutine(CloseMenu());
+    }
+
+    IEnumerator CloseMenu()
+    {
+        yield return new WaitForSeconds(_closeDelay);
         _menu.SetActive(false);
         _handAnchor = null;
+        _coroutine = null;
     }
 
     private void Pose_WhenSelected(ActiveStateSelector pose)
     {
+        if (_coroutine != null)
+        {
+            StopCoroutine(_coroutine);
+            _coroutine = null;
+        }
         var hand = pose.GetComponent<HandRef>();
         _handAnchor = hand;
         _menu.SetActive(true);
