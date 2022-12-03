@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Api : MonoBehaviour
+public class ApiClient : MonoBehaviour
 {
     public string BaseUrl;
 
@@ -71,22 +71,22 @@ public class Api : MonoBehaviour
         }
     }
 
-    IEnumerator GetRooms(Action<List<Room>> accept, Action<Exception> reject)
+    public IEnumerator GetRooms(Action<List<Room>> accept, Action<Exception> reject)
     {
         return ApiCall("rooms", "GET", null, accept, reject);
     }
 
-    IEnumerator GetRoomObjects(int id, Action<List<Obj>> accept, Action<Exception> reject)
+    public IEnumerator GetRoomObjects(int id, Action<List<Obj>> accept, Action<Exception> reject)
     {
         return ApiCall($"rooms/{id}/objects", "GET", null, accept, reject);
     }
 
-    IEnumerator GetAsset(int id, Action<Asset> accept, Action<Exception> reject)
+    public IEnumerator GetAsset(int id, Action<Asset> accept, Action<Exception> reject)
     {
         return ApiCall($"assets/{id}", "GET", null, accept, reject);
     }
 
-    IEnumerator DownloadAsset(int id, Action<string> accept, Action<Exception> reject)
+    public IEnumerator DownloadAsset(int id, Action<string> accept, Action<Exception> reject)
     {
         var path = Path.Combine(Application.persistentDataPath, AssetCachePath, id.ToString());
         if (File.Exists(path))
@@ -117,7 +117,7 @@ public class Api : MonoBehaviour
         accept(path);
     }
 
-    IEnumerator DownloadModel(Model model, Action<string> accept, Action<Exception> reject)
+    public IEnumerator DownloadModel(Model model, Action<string> accept, Action<Exception> reject)
     {
         var folder = Path.Combine(Application.persistentDataPath, ModelCachePath, model.Id.ToString());
         var path = Path.Combine(folder, model.Path);
