@@ -15,7 +15,16 @@ public class RoomController : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(LoadObjects());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+    }
+
+    public Coroutine StartLoadingObjects()
+    {
+        return StartCoroutine(LoadObjects());
     }
 
     IEnumerator LoadObjects()
@@ -48,8 +57,8 @@ public class RoomController : MonoBehaviour
     {
         string modelPath = null;
         yield return StartCoroutine(apiClient.DownloadModel(obj.Model, res => modelPath = res, err => Debug.Log(err)));
-        yield return new WaitForSeconds(5.0f);
         if (modelPath == null) yield break;
+
         var go = _loader.Load(modelPath);
         go.name = obj.Model.Name;
         var instance = Instantiate(go, obj.Translation, obj.Rotation);
@@ -58,10 +67,5 @@ public class RoomController : MonoBehaviour
         {
             Destroy(ph);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 }
