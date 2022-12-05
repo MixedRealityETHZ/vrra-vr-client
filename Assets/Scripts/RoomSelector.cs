@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class RoomSelector : MonoBehaviour
 {
+    public static Room SelectedRoom;
     public GameObject roomListItem;
     public GameObject roomList;
     public ApiClient apiClient;
@@ -41,15 +42,10 @@ public class RoomSelector : MonoBehaviour
             });
         }
     }
-    
+
     IEnumerator SwitchRoom(Room room)
     {
-        yield return SceneManager.LoadSceneAsync("Room", LoadSceneMode.Additive);
-        var controller = FindObjectOfType<RoomController>();
-        controller.roomId = room.Id;
-        var scene = SceneManager.GetSceneByName("Room");
-        SceneManager.SetActiveScene(scene);
-        controller.StartLoadingObjects();
-        SceneManager.UnloadSceneAsync("Init");
+        SelectedRoom = room;
+        yield return SceneManager.LoadSceneAsync("Room", LoadSceneMode.Single);
     }
 }

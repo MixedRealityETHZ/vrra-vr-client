@@ -9,12 +9,12 @@ using UnityEngine;
 public class RoomController : MonoBehaviour
 {
     public ApiClient apiClient;
-    public int roomId;
     public GameObject placeholderPrefab;
     private readonly OBJLoader _loader = new();
 
     void Start()
     {
+        StartLoadingObjects();
     }
 
     // Update is called once per frame
@@ -30,7 +30,7 @@ public class RoomController : MonoBehaviour
     IEnumerator LoadObjects()
     {
         List<Obj> objs = null;
-        yield return StartCoroutine(apiClient.GetRoomObjects(roomId, res => objs = res, err => Debug.Log(err)));
+        yield return StartCoroutine(apiClient.GetRoomObjects(RoomSelector.SelectedRoom.Id, res => objs = res, err => Debug.Log(err)));
         if (objs == null) yield break;
         List<Coroutine> coroutines = new List<Coroutine>();
         foreach (var obj in objs)
