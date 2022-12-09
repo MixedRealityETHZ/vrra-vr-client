@@ -17,14 +17,13 @@ public class ModelSelector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
     void Update()
     {
     }
-    
+
     public Coroutine StartGettingModels()
     {
         return StartCoroutine(GetModels());
@@ -33,7 +32,8 @@ public class ModelSelector : MonoBehaviour
     IEnumerator GetModels()
     {
         List<Model> models = null;
-        yield return StartCoroutine(apiClient.GetModels(RoomSelector.SelectedRoom.Id,res => models = res, err => Debug.Log(err)));
+        yield return StartCoroutine(apiClient.GetModels(RoomSelector.SelectedRoom.Id, res => models = res,
+            err => Debug.Log(err)));
         foreach (var model in models)
         {
             var go = Instantiate(modelListItem, modelList.transform);
@@ -43,9 +43,8 @@ public class ModelSelector : MonoBehaviour
             toggle.onValueChanged.AddListener((b) =>
             {
                 if (!b) return;
+                StartCoroutine(roomController.AddObject(model, toggle.transform));
             });
         }
     }
-
-    
 }

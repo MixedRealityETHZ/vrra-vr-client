@@ -16,6 +16,7 @@ public class ObjectController : MonoBehaviour
     private static readonly OBJLoader _loader = new();
     private GameObject _placeholder;
     private GameObject _instance;
+    private Mesh _mesh;
 
     // Start is called before the first frame update
     void Start()
@@ -27,33 +28,43 @@ public class ObjectController : MonoBehaviour
     {
     }
 
-    public IEnumerator LoadObject()
+    public IEnumerator LoadObject(Obj o)
     {
+        obj = o;
+        _instance = new GameObject("Object")
+        {
+            transform =
+            {
+                position = obj.Translation,
+                rotation = obj.Rotation,
+                localScale = obj.Scale
+            }
+        };
+
         var trans = transform;
-        trans.position = obj.Translation;
-        trans.rotation = obj.Rotation;
-        trans.localScale = obj.Scale;
+        _instance.transform.parent = trans;
+        _placeholder = Instantiate(_instance, trans);
+        _placeholder.name = "Placeholder";
 
         if (obj.Model.Bounds != null)
         {
-            _placeholder = Instantiate(placeholderPrefab, trans);
-            _placeholder.name = "Placeholder";
+            var ph = Instantiate(placeholderPrefab, _placeholder.transform);
+            ph.transform.localScale = obj.Model.Bounds.Value;
+        }
+        else
+        {
+            _placeholder.SetActive(false);
         }
 
         string modelPath = null;
         yield return StartCoroutine(apiClient.DownloadModel(obj.Model, res => modelPath = res, err => Debug.Log(err)));
         if (modelPath == null) yield break;
 
-        _instance = _loader.Load(modelPath);
-        _instance.transform.SetParent(trans, false);
+        var model = _loader.Load(modelPath);
+        model.transform.SetParent(_instance.transform, false);
 
-        if (_placeholder != null)
-        {
-            Destroy(_placeholder);
-            _placeholder = null;
-        }
-
-        EnableInteraction();
+        if (obj.Movable) EnableInteraction();
+        _placeholder.SetActive(false);
     }
 
     public void EnableInteraction()
@@ -64,10 +75,12 @@ public class ObjectController : MonoBehaviour
             mesh = mesh.sharedMesh,
             transform = _instance.transform.worldToLocalMatrix * mesh.transform.localToWorldMatrix
         }).ToArray();
-        var mesh = new Mesh();
-        mesh.CombineMeshes(combine);
+        _mesh = new Mesh();
+        _mesh.CombineMeshes(combine);
+        _placeholder.GetComponentInChildren<MeshFilter>().mesh = _mesh;
+
         var collider = _instance.AddComponent<MeshCollider>();
-        collider.sharedMesh = mesh;
+        collider.sharedMesh = _mesh;
         collider.convex = true;
         var rigidbody = _instance.AddComponent<Rigidbody>();
         rigidbody.useGravity = false;
@@ -77,26 +90,44 @@ public class ObjectController : MonoBehaviour
         handGrabInteractable.InjectOptionalPointableElement(grabbable);
         handGrabInteractable.InjectRigidbody(rigidbody);
         handGrabInteractable.HandAlignment = HandAlignType.None;
-        grabbable.WhenPointerEventRaised += e =>
+        grabbable.WhenPointerEventRaised += HandlePointerEvent;
+    }
+
+    public void Freeze()
+    {
+        _placeholder.SetActive(true);
+        _instance.SetActive(false);
+    }
+
+    public void Unfreeze()
+    {
+        _placeholder.SetActive(false);
+        _instance.SetActive(true);
+    }
+
+    private void HandlePointerEvent(PointerEvent e)
+    {
+        switch (e.Type)
         {
-            switch (e.Type)
-            {
-                case PointerEventType.Hover:
-                    break;
-                case PointerEventType.Unhover:
-                    break;
-                case PointerEventType.Select:
-                    Instantiate(_instance, transform);
-                    break;
-                case PointerEventType.Unselect:
-                    break;
-                case PointerEventType.Move:
-                    break;
-                case PointerEventType.Cancel:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        };
+            case PointerEventType.Hover:
+                break;
+            case PointerEventType.Unhover:
+                break;
+            case PointerEventType.Select:
+                _placeholder.transform.position = _instance.transform.position;
+                _placeholder.transform.rotation = _instance.transform.rotation;
+                _placeholder.transform.localScale = _instance.transform.localScale;
+                _placeholder.SetActive(true);
+                break;
+            case PointerEventType.Unselect:
+                _placeholder.SetActive(false);
+                break;
+            case PointerEventType.Move:
+                break;
+            case PointerEventType.Cancel:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }
