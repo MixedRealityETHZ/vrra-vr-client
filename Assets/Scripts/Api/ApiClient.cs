@@ -85,6 +85,11 @@ public class ApiClient : MonoBehaviour
     {
         return ApiCall($"assets/{id}", "GET", null, accept, reject);
     }
+    
+    public IEnumerator GetModels(int id, Action<List<Model>> accept, Action<Exception> reject)
+    {
+        return ApiCall($"models", "GET", null, accept, reject);
+    }
 
     public IEnumerator DownloadAsset(int id, Action<string> accept, Action<Exception> reject)
     {

@@ -8,6 +8,7 @@ public class FloatMenuController : MonoBehaviour
     public GameObject floatMenu;
     public GameObject objectStoreMenu;
     public GameObject menuCanvas;
+    public ModelSelector modelSelector;
     public Vector2 objectStoreMenuSize = new Vector2(450, 600);
     public Vector2 floatMenuSize = new Vector2(350, 400);
 
@@ -32,6 +33,7 @@ public class FloatMenuController : MonoBehaviour
         floatMenu.SetActive(false);
         objectStoreMenu.SetActive(true);
         menuCanvas.GetComponent<RectTransform>().sizeDelta = objectStoreMenuSize;
+        modelSelector.StartGettingModels();
     }
 
     public void ShowFloatMenu()
