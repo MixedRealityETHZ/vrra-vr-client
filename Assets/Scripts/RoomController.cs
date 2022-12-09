@@ -3,7 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Assets.Scripts.Api.Models;
+using Oculus.Interaction;
+using Oculus.Interaction.HandGrab;
 using UnityEngine;
 
 public class RoomController : MonoBehaviour
@@ -30,7 +33,8 @@ public class RoomController : MonoBehaviour
     IEnumerator LoadObjects()
     {
         List<Obj> objs = null;
-        yield return StartCoroutine(apiClient.GetRoomObjects(RoomSelector.SelectedRoom.Id, res => objs = res, err => Debug.Log(err)));
+        yield return StartCoroutine(apiClient.GetRoomObjects(RoomSelector.SelectedRoom.Id, res => objs = res,
+            err => Debug.Log(err)));
         if (objs == null) yield break;
         List<Coroutine> coroutines = new List<Coroutine>();
         foreach (var obj in objs)
@@ -59,13 +63,42 @@ public class RoomController : MonoBehaviour
         yield return StartCoroutine(apiClient.DownloadModel(obj.Model, res => modelPath = res, err => Debug.Log(err)));
         if (modelPath == null) yield break;
 
-        var go = _loader.Load(modelPath);
-        go.name = obj.Model.Name;
-        var instance = Instantiate(go, obj.Translation, obj.Rotation);
-        instance.transform.localScale = obj.Scale;
+        var child = _loader.Load(modelPath);
+        var parent = new GameObject(obj.Model.Name);
+        parent.transform.position = obj.Translation;
+        parent.transform.rotation = obj.Rotation;
+        parent.transform.localScale = obj.Scale;
+        child.transform.SetParent(parent.transform, false);
+
+        ProcessObject(parent);
         if (ph != null)
         {
             Destroy(ph);
         }
+    }
+
+    void ProcessObject(GameObject obj)
+    {
+        var meshes = obj.GetComponentsInChildren<MeshFilter>();
+        var combine = meshes.Select(mesh => new CombineInstance()
+            { mesh = mesh.sharedMesh, transform = obj.transform.worldToLocalMatrix * mesh.transform.localToWorldMatrix }).ToArray();
+        var mesh = new Mesh();
+        mesh.CombineMeshes(combine);
+        var collider = obj.AddComponent<MeshCollider>();
+        collider.sharedMesh = mesh;
+        collider.convex = true;
+        var rigidbody = obj.AddComponent<Rigidbody>();
+        rigidbody.useGravity = false;
+        rigidbody.isKinematic = true;
+        var grabbable = obj.AddComponent<Grabbable>();
+        var handGrabInteractable = obj.AddComponent<HandGrabInteractable>();
+        handGrabInteractable.InjectOptionalPointableElement(grabbable);
+        handGrabInteractable.InjectRigidbody(rigidbody);
+        handGrabInteractable.HandAlignment = HandAlignType.None;
+    }
+
+    IEnumerator AddObject(Model model, Vector3 translation, Quaternion rotation, Vector3 Scale)
+    {
+        throw new NotImplementedException();
     }
 }
