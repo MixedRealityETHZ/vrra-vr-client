@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using Assets.Scripts.Api.Models;
 using Oculus.Interaction;
 using TMPro;
@@ -44,19 +43,10 @@ public class RoomSelector : MonoBehaviour
             if (room.ThumbnailAssetId.HasValue)
             {
                 var image = toggle.transform.Find("Image").GetComponent<Image>();
-                StartCoroutine(DownloadThumbnail(room.ThumbnailAssetId.Value, image));
+                StartCoroutine(apiClient.DownloadSprite(room.ThumbnailAssetId.Value, sprite => image.sprite = sprite,
+                    err => Debug.Log(err)));
             }
         }
-    }
-
-    IEnumerator DownloadThumbnail(int assetId, Image image)
-    {
-        string path = null;
-        yield return StartCoroutine(apiClient.DownloadAsset(assetId, res => path = res, err => Debug.Log(err)));
-        var data = File.ReadAllBytes(path);
-        var tex = new Texture2D(2, 2);
-        tex.LoadImage(data);
-        image.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
     }
 
     IEnumerator SwitchRoom(Room room)

@@ -153,4 +153,15 @@ public class ApiClient : MonoBehaviour
 
         accept(path);
     }
+    
+    public IEnumerator DownloadSprite(int assetId, Action<Sprite> accept, Action<Exception> reject)
+    {
+        string path = null;
+        yield return StartCoroutine(DownloadAsset(assetId, res => path = res, reject));
+        var data = File.ReadAllBytes(path);
+        var tex = new Texture2D(2, 2);
+        tex.LoadImage(data);
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
+        accept(sprite);
+    }
 }

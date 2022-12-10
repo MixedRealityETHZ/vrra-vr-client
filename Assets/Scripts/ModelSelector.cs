@@ -45,6 +45,12 @@ public class ModelSelector : MonoBehaviour
                 if (!b) return;
                 StartCoroutine(roomController.AddObject(model, toggle.transform));
             });
+            if (model.ThumbnailAssetId.HasValue)
+            {
+                var image = toggle.transform.Find("Image").GetComponent<Image>();
+                StartCoroutine(apiClient.DownloadSprite(model.ThumbnailAssetId.Value, sprite => image.sprite = sprite,
+                    err => Debug.Log(err)));
+            }
         }
     }
 }
