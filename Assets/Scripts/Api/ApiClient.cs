@@ -36,13 +36,14 @@ public class ApiClient : MonoBehaviour
         {
             var json = JsonConvert.SerializeObject(body);
             req.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
+            req.SetRequestHeader("Content-Type", "application/json");
         }
 
         req.downloadHandler = new DownloadHandlerBuffer();
         return req;
     }
 
-    IEnumerator ApiCall<TRes>(string uri, string method, object body, Action<TRes?>? accept, Action<Exception> reject)
+    IEnumerator ApiCall<TRes>(string uri, string method, object body, Action<TRes> accept, Action<Exception> reject)
     {
         var req = ApiReq(uri, method, body);
         yield return req.SendWebRequest();
@@ -71,6 +72,26 @@ public class ApiClient : MonoBehaviour
         }
     }
 
+    IEnumerator ApiCall(string uri, string method, object body, Action accept, Action<Exception> reject)
+    {
+        var req = ApiReq(uri, method, body);
+        yield return req.SendWebRequest();
+
+        if (req.result != UnityWebRequest.Result.Success)
+        {
+            reject(new Exception(req.error));
+            yield break;
+        }
+
+        if (req.responseCode is < 200 or >= 300)
+        {
+            reject(new Exception(req.downloadHandler.text));
+            yield break;
+        }
+
+        accept();
+    }
+
     public IEnumerator GetRooms(Action<List<Room>> accept, Action<Exception> reject)
     {
         return ApiCall("rooms", "GET", null, accept, reject);
@@ -85,15 +106,20 @@ public class ApiClient : MonoBehaviour
     {
         return ApiCall($"assets/{id}", "GET", null, accept, reject);
     }
-    
+
     public IEnumerator GetModels(int id, Action<List<Model>> accept, Action<Exception> reject)
     {
         return ApiCall($"models", "GET", null, accept, reject);
     }
-    
+
     public IEnumerator AddObject(int roomId, AddObjBody body, Action<Obj> accept, Action<Exception> reject)
     {
         return ApiCall($"rooms/{roomId}/objects", "POST", body, accept, reject);
+    }
+
+    public IEnumerator UpdateObject(int roomId, int objId, AddObjBody body, Action accept, Action<Exception> reject)
+    {
+        return ApiCall($"rooms/{roomId}/objects/{objId}", "PUT", body, accept, reject);
     }
 
     public IEnumerator DownloadAsset(int id, Action<string> accept, Action<Exception> reject)
@@ -153,7 +179,7 @@ public class ApiClient : MonoBehaviour
 
         accept(path);
     }
-    
+
     public IEnumerator DownloadSprite(int assetId, Action<Sprite> accept, Action<Exception> reject)
     {
         string path = null;

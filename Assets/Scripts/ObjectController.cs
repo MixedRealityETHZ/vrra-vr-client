@@ -105,6 +105,10 @@ public class ObjectController : MonoBehaviour
         _instance.SetActive(true);
     }
 
+    private void UpdateObj(Action accept)
+    {
+    }
+
     private void HandlePointerEvent(PointerEvent e)
     {
         switch (e.Type)
@@ -120,7 +124,16 @@ public class ObjectController : MonoBehaviour
                 _placeholder.SetActive(true);
                 break;
             case PointerEventType.Unselect:
-                _placeholder.SetActive(false);
+                var body = new AddObjBody()
+                {
+                    ModelId = obj.Model.Id,
+                    Movable = obj.Movable,
+                    Rotation = _instance.transform.rotation,
+                    Scale = _instance.transform.localScale,
+                    Translation = _instance.transform.position
+                };
+                StartCoroutine(apiClient.UpdateObject(RoomSelector.SelectedRoom.Id, obj.Id, body,
+                    () => { _placeholder.SetActive(false); }, err => Debug.Log(err)));
                 break;
             case PointerEventType.Move:
                 break;
