@@ -13,5 +13,7 @@ namespace Assets.Scripts.Api.Models
         public Vector3? Bounds { get; set; }
 
         public int AssetId { get; set; }
+        
+        public int? ThumbnailAssetId { get; set; }
     }
 }
