@@ -11,11 +11,11 @@ using UnityEngine.Networking;
 
 public class ApiClient : MonoBehaviour
 {
-    public string BaseUrl;
+    public static string BaseUrl = "https://vrra.howyoung.dev";
 
-    public string AssetCachePath = "assets";
+    public static string AssetCachePath = "assets";
 
-    public string ModelCachePath = "models";
+    public static string ModelCachePath = "models";
 
     private Uri BaseUri => new(BaseUrl);
 

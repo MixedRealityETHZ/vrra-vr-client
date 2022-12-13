@@ -49,7 +49,7 @@ public class ObjectController : MonoBehaviour
         if (obj.Model.Bounds != null)
         {
             var ph = Instantiate(placeholderPrefab, _placeholder.transform);
-            ph.transform.localScale = obj.Model.Bounds.Value;
+            _placeholder.transform.localScale = obj.Model.Bounds.Value;
         }
         else
         {
@@ -78,6 +78,7 @@ public class ObjectController : MonoBehaviour
         _mesh = new Mesh();
         _mesh.CombineMeshes(combine);
         _placeholder.GetComponentInChildren<MeshFilter>().mesh = _mesh;
+        _placeholder.transform.localScale = Vector3.one;
 
         var collider = _instance.AddComponent<MeshCollider>();
         collider.sharedMesh = _mesh;
