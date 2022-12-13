@@ -13,7 +13,6 @@ public class ObjectController : MonoBehaviour
     public ApiClient apiClient;
     public GameObject placeholderPrefab;
 
-    private static readonly OBJLoader _loader = new();
     private GameObject _placeholder;
     private GameObject _instance;
     private Mesh _mesh;
@@ -60,7 +59,7 @@ public class ObjectController : MonoBehaviour
         yield return StartCoroutine(apiClient.DownloadModel(obj.Model, res => modelPath = res, err => Debug.Log(err)));
         if (modelPath == null) yield break;
 
-        var model = _loader.Load(modelPath);
+        var model = new OBJLoader().Load(modelPath);
         model.transform.SetParent(_instance.transform, false);
 
         if (obj.Movable) EnableInteraction();
