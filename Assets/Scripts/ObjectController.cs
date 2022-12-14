@@ -4,6 +4,7 @@ using System.Linq;
 using Assets.Scripts.Api.Models;
 using Dummiesman;
 using Oculus.Interaction;
+using Oculus.Interaction.DistanceReticles;
 using Oculus.Interaction.HandGrab;
 using UnityEngine;
 
@@ -108,6 +109,17 @@ public class ObjectController : MonoBehaviour
         handGrabInteractable.InjectOptionalPointableElement(grabbable);
         handGrabInteractable.InjectRigidbody(rigidbody);
         handGrabInteractable.HandAlignment = HandAlignType.None;
+        
+        var disHandGrabInteractable = _instance.AddComponent<DistanceHandGrabInteractable>();
+        disHandGrabInteractable.InjectOptionalPointableElement(grabbable);
+        disHandGrabInteractable.InjectRigidbody(rigidbody);
+        disHandGrabInteractable.HandAlignment = HandAlignType.None;
+        
+        var moveProvider = _instance.AddComponent<MoveFromTargetProvider>();
+        disHandGrabInteractable.InjectOptionalMovementProvider(moveProvider);
+        
+        var reticle = _instance.AddComponent<ReticleDataIcon>();
+        reticle.InjectOptionalColliders(new Collider[] {collider});
         grabbable.WhenPointerEventRaised += HandlePointerEvent;
     }
 
