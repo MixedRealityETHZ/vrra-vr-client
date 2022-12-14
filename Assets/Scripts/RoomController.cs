@@ -20,13 +20,25 @@ public class RoomController : MonoBehaviour
     {
     }
 
-    public Coroutine StartLoadingObjects()
+    public void StartLoadingObjects()
     {
-        return StartCoroutine(LoadObjects());
+        StartCoroutine(LoadObjects());
     }
 
-    IEnumerator LoadObjects()
+    private void RemoveAllObjects()
     {
+        foreach (var objController in objControllers)
+        {
+            Destroy(objController.gameObject);
+        }
+
+        objControllers.Clear();
+    }
+
+    private IEnumerator LoadObjects()
+    {
+        RemoveAllObjects();
+
         List<Obj> objs = null;
         yield return StartCoroutine(apiClient.GetRoomObjects(RoomSelector.SelectedRoom.Id, res => objs = res,
             err => Debug.Log(err)));
@@ -113,6 +125,7 @@ public class RoomController : MonoBehaviour
         {
             DeleteObject(objController);
         }
+
         objControllers.RemoveAll(objController => objController.deleted);
     }
 }
