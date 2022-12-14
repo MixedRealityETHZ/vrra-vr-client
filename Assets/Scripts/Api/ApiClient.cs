@@ -121,6 +121,11 @@ public class ApiClient : MonoBehaviour
     {
         return ApiCall($"rooms/{roomId}/objects/{objId}", "PUT", body, accept, reject);
     }
+    
+    public IEnumerator DeleteObject(int roomId, int objId, Action accept, Action<Exception> reject)
+    {
+        return ApiCall($"rooms/{roomId}/objects/{objId}", "DELETE", null, accept, reject);
+    }
 
     public IEnumerator DownloadAsset(int id, Action<string> accept, Action<Exception> reject)
     {

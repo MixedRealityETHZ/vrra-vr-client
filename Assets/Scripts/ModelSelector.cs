@@ -31,6 +31,14 @@ public class ModelSelector : MonoBehaviour
 
     IEnumerator GetModels()
     {
+        foreach (var child in modelList.GetComponentsInChildren<Transform>())
+        {
+            if (child != modelList.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
         List<Model> models = null;
         yield return StartCoroutine(apiClient.GetModels(RoomSelector.SelectedRoom.Id, res => models = res,
             err => Debug.Log(err)));

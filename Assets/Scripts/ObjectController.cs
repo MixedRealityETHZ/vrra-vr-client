@@ -13,6 +13,9 @@ public class ObjectController : MonoBehaviour
     public ApiClient apiClient;
     public GameObject placeholderPrefab;
 
+    private bool _deleteMode = false;
+    public bool deleted = false;
+
     private GameObject _placeholder;
     private GameObject _prevState;
     private GameObject _instance;
@@ -120,8 +123,15 @@ public class ObjectController : MonoBehaviour
         _instance.SetActive(true);
     }
 
-    private void UpdateObj(Action accept)
+    public void EnableDeleteMode()
     {
+        _deleteMode = true;
+    }
+    
+    public void DisableDeleteMode()
+    {
+        _deleteMode = false;
+        Unfreeze();
     }
 
     private void HandlePointerEvent(PointerEvent e)
@@ -129,6 +139,10 @@ public class ObjectController : MonoBehaviour
         switch (e.Type)
         {
             case PointerEventType.Hover:
+                if (!_deleteMode) break;
+                deleted = !deleted;
+                if (deleted) Freeze();
+                else Unfreeze();
                 break;
             case PointerEventType.Unhover:
                 break;
@@ -148,7 +162,13 @@ public class ObjectController : MonoBehaviour
                     Translation = _instance.transform.position
                 };
                 StartCoroutine(apiClient.UpdateObject(RoomSelector.SelectedRoom.Id, obj.Id, body,
-                    () => { _prevState.SetActive(false); }, err => Debug.Log(err)));
+                    () =>
+                    {
+                        _prevState.transform.position = _instance.transform.position;
+                        _prevState.transform.rotation = _instance.transform.rotation;
+                        _prevState.transform.localScale = _instance.transform.localScale;
+                        _prevState.SetActive(false);
+                    }, err => Debug.Log(err)));
                 break;
             case PointerEventType.Move:
                 break;

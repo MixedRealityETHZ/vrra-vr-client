@@ -80,4 +80,39 @@ public class RoomController : MonoBehaviour
         objControllers.Add(ctrl);
         return ctrl;
     }
+
+    public void EnableDeleteMode()
+    {
+        foreach (var objController in objControllers)
+        {
+            objController.EnableDeleteMode();
+        }
+    }
+
+    public void CancelDelete()
+    {
+        foreach (var objController in objControllers)
+        {
+            objController.DisableDeleteMode();
+        }
+    }
+
+    private void DeleteObject(ObjectController ctrl)
+    {
+        StartCoroutine(apiClient.DeleteObject(
+            RoomSelector.SelectedRoom.Id,
+            ctrl.obj.Id,
+            () => { Destroy(ctrl.gameObject); },
+            err => { Debug.LogError(err.Message, this); }
+        ));
+    }
+
+    public void ConfirmDelete()
+    {
+        foreach (var objController in objControllers.Where(objController => objController.deleted))
+        {
+            DeleteObject(objController);
+        }
+        objControllers.RemoveAll(objController => objController.deleted);
+    }
 }
