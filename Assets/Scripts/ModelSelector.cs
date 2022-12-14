@@ -24,9 +24,9 @@ public class ModelSelector : MonoBehaviour
     {
     }
 
-    public Coroutine StartGettingModels()
+    public void StartGettingModels()
     {
-        return StartCoroutine(GetModels());
+        StartCoroutine(GetModels());
     }
 
     IEnumerator GetModels()
