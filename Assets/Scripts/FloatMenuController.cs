@@ -51,13 +51,13 @@ public class FloatMenuController : MonoBehaviour
             top.menu.SetActive(false);
         }
 
-        var menu = menuCanvas.transform.Find(name).gameObject;
-        _menuStack.Push(new MenuState(menu, size));
-        menu.SetActive(true);
-
         var rect = menuCanvas.GetComponent<RectTransform>();
         rect.sizeDelta = size;
         LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+        
+        var menu = menuCanvas.transform.Find(name).gameObject;
+        _menuStack.Push(new MenuState(menu, size));
+        menu.SetActive(true);
     }
 
     public void PopMenu()
@@ -71,11 +71,10 @@ public class FloatMenuController : MonoBehaviour
         if (_menuStack.Count > 0)
         {
             var top = _menuStack.Peek();
-            top.menu.SetActive(true);
-
             var rect = menuCanvas.GetComponent<RectTransform>();
             rect.sizeDelta = top.size;
             LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            top.menu.SetActive(true);
         }
     }
 
