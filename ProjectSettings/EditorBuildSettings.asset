@@ -8,9 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Welcome.unity
     guid: 3586f6602e4c7c3408add705c6cf8d99
-  - enabled: 0
-    path: Assets/Scenes/RoomLegacy.unity
-    guid: 826837aa0dfb6ea429350cffcb14a70a
   - enabled: 1
     path: Assets/Scenes/Room.unity
     guid: d48660169061eb94ab89f42dc475a9b9
