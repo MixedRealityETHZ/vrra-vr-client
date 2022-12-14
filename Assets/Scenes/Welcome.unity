@@ -923,6 +923,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1919344763264231735, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2262886113383552122, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2262886113408362808, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -931,6 +939,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 2262886113736088760, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4981534101861706115, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -938,6 +950,10 @@ PrefabInstance:
     - target: {fileID: 6600396371627242169, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
       propertyPath: m_Name
       value: RoomEnvironment
+      objectReference: {fileID: 0}
+    - target: {fileID: 6600396371627242169, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7465595094415625429, guid: a912065df8e0b4b4385507810e31c60d, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -3537,9 +3553,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4804a5c2719f8e94a84045dddd30db1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseUrl: http://localhost:5089
-  AssetCachePath: assets
-  ModelCachePath: models
 --- !u!114 &1881120414
 MonoBehaviour:
   m_ObjectHideFlags: 0
