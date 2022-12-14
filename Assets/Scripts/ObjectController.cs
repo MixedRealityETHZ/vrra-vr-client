@@ -84,10 +84,23 @@ public class ObjectController : MonoBehaviour
         var collider = _instance.AddComponent<MeshCollider>();
         collider.sharedMesh = _mesh;
         collider.convex = true;
+        
         var rigidbody = _instance.AddComponent<Rigidbody>();
         rigidbody.useGravity = false;
         rigidbody.isKinematic = true;
+        
+        var oneGrabTrans = _instance.AddComponent<OneGrabFreeTransformer>();
+        var twoGrabTrans = _instance.AddComponent<TwoGrabFreeTransformer>();
+        twoGrabTrans.Constraints = new TwoGrabFreeTransformer.TwoGrabFreeConstraints()
+        {
+            MinScale = new FloatConstraint(),
+            MaxScale = new FloatConstraint(),
+        };
+        
         var grabbable = _instance.AddComponent<Grabbable>();
+        grabbable.InjectOptionalOneGrabTransformer(oneGrabTrans);
+        grabbable.InjectOptionalTwoGrabTransformer(twoGrabTrans);
+
         var handGrabInteractable = _instance.AddComponent<HandGrabInteractable>();
         handGrabInteractable.InjectOptionalPointableElement(grabbable);
         handGrabInteractable.InjectRigidbody(rigidbody);
