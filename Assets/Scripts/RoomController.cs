@@ -32,7 +32,7 @@ public class RoomController : MonoBehaviour
             err => Debug.Log(err)));
         if (objs == null) yield break;
 
-        var coroutines = objs.Select(obj => StartCoroutine(LoadObject(obj).LoadObject(obj))).ToList();
+        var coroutines = objs.Select(obj => StartCoroutine(AddObjectController(obj).LoadObject(obj))).ToList();
 
         foreach (var coroutine in coroutines)
         {
@@ -53,7 +53,7 @@ public class RoomController : MonoBehaviour
             Scale = trans.localScale,
             Translation = trans.position,
         };
-        var ctrl = LoadObject(obj);
+        var ctrl = AddObjectController(obj);
         var c1 = StartCoroutine(ctrl.LoadObject(obj));
 
         var body = new AddObjBody()
@@ -71,7 +71,7 @@ public class RoomController : MonoBehaviour
         ctrl.Unfreeze();
     }
 
-    ObjectController LoadObject(Obj obj)
+    ObjectController AddObjectController(Obj obj)
     {
         var instance = new GameObject(obj.Model.Name);
         var ctrl = instance.AddComponent<ObjectController>();

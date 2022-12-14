@@ -14,6 +14,7 @@ public class ObjectController : MonoBehaviour
     public GameObject placeholderPrefab;
 
     private GameObject _placeholder;
+    private GameObject _prevState;
     private GameObject _instance;
     private Mesh _mesh;
 
@@ -42,17 +43,19 @@ public class ObjectController : MonoBehaviour
 
         var trans = transform;
         _instance.transform.parent = trans;
-        _placeholder = Instantiate(_instance, trans);
-        _placeholder.name = "Placeholder";
 
+        _prevState = Instantiate(_instance, trans);
+        _prevState.name = "Previous State";
+        Instantiate(placeholderPrefab, _prevState.transform);
+        _prevState.SetActive(false);
+        
         if (obj.Model.Bounds != null)
         {
+            _placeholder = Instantiate(_instance, trans);
+            _placeholder.name = "Placeholder";
             var ph = Instantiate(placeholderPrefab, _placeholder.transform);
-            _placeholder.transform.localScale = obj.Model.Bounds.Value;
-        }
-        else
-        {
-            _placeholder.SetActive(false);
+            ph.transform.localPosition = obj.Model.Bounds.Center;
+            ph.transform.localScale = obj.Model.Bounds.Size;
         }
 
         string modelPath = null;
@@ -63,7 +66,7 @@ public class ObjectController : MonoBehaviour
         model.transform.SetParent(_instance.transform, false);
 
         if (obj.Movable) EnableInteraction();
-        _placeholder.SetActive(false);
+        if(_placeholder != null) Destroy(_placeholder);
     }
 
     public void EnableInteraction()
@@ -76,8 +79,7 @@ public class ObjectController : MonoBehaviour
         }).ToArray();
         _mesh = new Mesh();
         _mesh.CombineMeshes(combine);
-        _placeholder.GetComponentInChildren<MeshFilter>().mesh = _mesh;
-        _placeholder.transform.localScale = Vector3.one;
+        _prevState.GetComponentInChildren<MeshFilter>().mesh = _mesh;
 
         var collider = _instance.AddComponent<MeshCollider>();
         collider.sharedMesh = _mesh;
@@ -95,13 +97,13 @@ public class ObjectController : MonoBehaviour
 
     public void Freeze()
     {
-        _placeholder.SetActive(true);
+        _prevState.SetActive(true);
         _instance.SetActive(false);
     }
 
     public void Unfreeze()
     {
-        _placeholder.SetActive(false);
+        _prevState.SetActive(false);
         _instance.SetActive(true);
     }
 
@@ -118,10 +120,10 @@ public class ObjectController : MonoBehaviour
             case PointerEventType.Unhover:
                 break;
             case PointerEventType.Select:
-                _placeholder.transform.position = _instance.transform.position;
-                _placeholder.transform.rotation = _instance.transform.rotation;
-                _placeholder.transform.localScale = _instance.transform.localScale;
-                _placeholder.SetActive(true);
+                _prevState.transform.position = _instance.transform.position;
+                _prevState.transform.rotation = _instance.transform.rotation;
+                _prevState.transform.localScale = _instance.transform.localScale;
+                _prevState.SetActive(true);
                 break;
             case PointerEventType.Unselect:
                 var body = new AddObjBody()
@@ -133,7 +135,7 @@ public class ObjectController : MonoBehaviour
                     Translation = _instance.transform.position
                 };
                 StartCoroutine(apiClient.UpdateObject(RoomSelector.SelectedRoom.Id, obj.Id, body,
-                    () => { _placeholder.SetActive(false); }, err => Debug.Log(err)));
+                    () => { _prevState.SetActive(false); }, err => Debug.Log(err)));
                 break;
             case PointerEventType.Move:
                 break;
