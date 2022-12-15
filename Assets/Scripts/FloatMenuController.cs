@@ -12,6 +12,8 @@ public class FloatMenuController : MonoBehaviour
     public ModelSelector modelSelector;
     public Vector2 objectStoreMenuSize = new Vector2(450, 600);
     public Vector2 floatMenuSize = new Vector2(350, 400);
+    public GameObject cameraRig;
+    public float moveSpeed = 0.1f;
 
     private class MenuState
     {
@@ -92,5 +94,40 @@ public class FloatMenuController : MonoBehaviour
     public void ShowDeleteMenu()
     {
         PushMenu("Delete", floatMenuSize);
+    }
+    
+    public void ShowMoveMenu()
+    {
+        PushMenu("Move", floatMenuSize);
+    }
+    
+    public void MoveForward()
+    {
+        cameraRig.transform.position += Vector3.forward * moveSpeed;
+    }
+    
+    public void MoveBackward()
+    {
+        cameraRig.transform.position += Vector3.back * moveSpeed;
+    }
+    
+    public void MoveLeft()
+    {
+        cameraRig.transform.position += Vector3.left * moveSpeed;
+    }
+    
+    public void MoveRight()
+    {
+        cameraRig.transform.position += Vector3.right * moveSpeed;
+    }
+    
+    public void MoveUp()
+    {
+        cameraRig.transform.position += Vector3.up * moveSpeed;
+    }
+    
+    public void MoveDown()
+    {
+        cameraRig.transform.position += Vector3.down * moveSpeed;
     }
 }

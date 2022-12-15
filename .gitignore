@@ -85,4 +85,4 @@ crashlytics-build.properties
 
 /OVRAssetBundles/
 
-build_*/
+/Build/
