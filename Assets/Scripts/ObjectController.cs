@@ -5,7 +5,10 @@ using Assets.Scripts.Api.Models;
 using Dummiesman;
 using Oculus.Interaction;
 using Oculus.Interaction.DistanceReticles;
+using Oculus.Interaction.Grab;
+using Oculus.Interaction.GrabAPI;
 using Oculus.Interaction.HandGrab;
+using Oculus.Interaction.Input;
 using UnityEngine;
 
 public class ObjectController : MonoBehaviour
@@ -52,7 +55,7 @@ public class ObjectController : MonoBehaviour
         _prevState.name = "Previous State";
         Instantiate(placeholderPrefab, _prevState.transform);
         _prevState.SetActive(false);
-        
+
         if (obj.Model.Bounds != null)
         {
             _placeholder = Instantiate(_instance, trans);
@@ -70,7 +73,7 @@ public class ObjectController : MonoBehaviour
         model.transform.SetParent(_instance.transform, false);
 
         if (obj.Movable) EnableInteraction();
-        if(_placeholder != null) Destroy(_placeholder);
+        if (_placeholder != null) Destroy(_placeholder);
     }
 
     public void EnableInteraction()
@@ -88,11 +91,11 @@ public class ObjectController : MonoBehaviour
         var collider = _instance.AddComponent<MeshCollider>();
         collider.sharedMesh = _mesh;
         collider.convex = true;
-        
+
         var rigidbody = _instance.AddComponent<Rigidbody>();
         rigidbody.useGravity = false;
         rigidbody.isKinematic = true;
-        
+
         var oneGrabTrans = _instance.AddComponent<OneGrabFreeTransformer>();
         var twoGrabTrans = _instance.AddComponent<TwoGrabFreeTransformer>();
         twoGrabTrans.Constraints = new TwoGrabFreeTransformer.TwoGrabFreeConstraints()
@@ -100,7 +103,7 @@ public class ObjectController : MonoBehaviour
             MinScale = new FloatConstraint(),
             MaxScale = new FloatConstraint(),
         };
-        
+
         var grabbable = _instance.AddComponent<Grabbable>();
         grabbable.InjectOptionalOneGrabTransformer(oneGrabTrans);
         grabbable.InjectOptionalTwoGrabTransformer(twoGrabTrans);
@@ -109,17 +112,20 @@ public class ObjectController : MonoBehaviour
         handGrabInteractable.InjectOptionalPointableElement(grabbable);
         handGrabInteractable.InjectRigidbody(rigidbody);
         handGrabInteractable.HandAlignment = HandAlignType.None;
-        
+
         var disHandGrabInteractable = _instance.AddComponent<DistanceHandGrabInteractable>();
         disHandGrabInteractable.InjectOptionalPointableElement(grabbable);
         disHandGrabInteractable.InjectRigidbody(rigidbody);
         disHandGrabInteractable.HandAlignment = HandAlignType.None;
-        
+        disHandGrabInteractable.InjectSupportedGrabTypes(GrabTypeFlags.Pinch);
+        disHandGrabInteractable.InjectPinchGrabRules(new GrabbingRule(
+            HandFingerFlags.Thumb | HandFingerFlags.Index | HandFingerFlags.Middle, GrabbingRule.FullGrab));
+
         var moveProvider = _instance.AddComponent<MoveFromTargetProvider>();
         disHandGrabInteractable.InjectOptionalMovementProvider(moveProvider);
-        
+
         var reticle = _instance.AddComponent<ReticleDataIcon>();
-        reticle.InjectOptionalColliders(new Collider[] {collider});
+        reticle.InjectOptionalColliders(new Collider[] { collider });
         grabbable.WhenPointerEventRaised += HandlePointerEvent;
     }
 
@@ -139,7 +145,7 @@ public class ObjectController : MonoBehaviour
     {
         _deleteMode = true;
     }
-    
+
     public void DisableDeleteMode()
     {
         _deleteMode = false;
