@@ -17,7 +17,7 @@ public class RoomSelector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(GetRooms());
+        StartLoadingRooms();
     }
 
     // Update is called once per frame
@@ -25,8 +25,21 @@ public class RoomSelector : MonoBehaviour
     {
     }
 
+    public void StartLoadingRooms()
+    {
+        StartCoroutine(GetRooms());
+    }
+
     IEnumerator GetRooms()
     {
+        foreach (var child in roomList.GetComponentsInChildren<Transform>())
+        {
+            if (child != roomList.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
         List<Room> rooms = null;
         yield return StartCoroutine(apiClient.GetRooms(res => rooms = res, err => Debug.Log(err)));
         foreach (var room in rooms)
