@@ -3202,6 +3202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   apiClient: {fileID: 638569415}
   placeholderPrefab: {fileID: 5357091637954946947, guid: 127f1d2efe369654d9f452cc27a6dbde, type: 3}
+  placeholderMaterial: {fileID: 2100000, guid: 4080c46345f3b0b498808143cca27d02, type: 2}
   objControllers: []
 --- !u!4 &345129672
 Transform:

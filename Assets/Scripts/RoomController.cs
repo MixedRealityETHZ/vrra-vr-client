@@ -8,6 +8,7 @@ public class RoomController : MonoBehaviour
 {
     public ApiClient apiClient;
     public GameObject placeholderPrefab;
+    public Material placeholderMaterial;
     public List<ObjectController> objControllers = new();
 
     void Start()
@@ -89,6 +90,7 @@ public class RoomController : MonoBehaviour
         var ctrl = instance.AddComponent<ObjectController>();
         ctrl.apiClient = apiClient;
         ctrl.placeholderPrefab = placeholderPrefab;
+        ctrl.placeholderMaterial = placeholderMaterial;
         objControllers.Add(ctrl);
         return ctrl;
     }

@@ -16,6 +16,7 @@ public class ObjectController : MonoBehaviour
     public Obj obj;
     public ApiClient apiClient;
     public GameObject placeholderPrefab;
+    public Material placeholderMaterial;
 
     private bool _deleteMode = false;
     public bool deleted = false;
@@ -53,7 +54,6 @@ public class ObjectController : MonoBehaviour
 
         _prevState = Instantiate(_instance, trans);
         _prevState.name = "Previous State";
-        Instantiate(placeholderPrefab, _prevState.transform);
         _prevState.SetActive(false);
 
         if (obj.Model.Bounds != null)
@@ -69,8 +69,6 @@ public class ObjectController : MonoBehaviour
         yield return StartCoroutine(apiClient.DownloadModel(obj.Model, res => modelPath = res, err => Debug.Log(err)));
         if (modelPath == null) yield break;
 
-        // var model = new OBJLoader().Load(modelPath);
-        // model.transform.SetParent(_instance.transform, false);
         var options = new ImportOptions()
         {
             zUp = false,
@@ -80,7 +78,7 @@ public class ObjectController : MonoBehaviour
         if (obj.Movable)
         {
             options.buildColliders = true;
-            options.colliderConvex = true;
+            options.colliderConvex = false;
             options.colliderTrigger = true;
         }
 
@@ -93,20 +91,13 @@ public class ObjectController : MonoBehaviour
 
     public void EnableInteraction()
     {
-        // var meshes = _instance.GetComponentsInChildren<MeshFilter>();
-        // var combine = meshes.Select(mesh => new CombineInstance()
-        // {
-        //     mesh = mesh.sharedMesh,
-        //     transform = _instance.transform.worldToLocalMatrix * mesh.transform.localToWorldMatrix
-        // }).ToArray();
-        // _mesh = new Mesh();
-        // _mesh.CombineMeshes(combine);
         _mesh = _instance.GetComponentInChildren<MeshFilter>().mesh;
-        _prevState.GetComponentInChildren<MeshFilter>().mesh = _mesh;
-
-        // var collider = _instance.AddComponent<MeshCollider>();
-        // collider.sharedMesh = _mesh;
-        // collider.convex = true;
+        var prevStateVis = new GameObject("Visual");
+        prevStateVis.transform.SetParent(_prevState.transform, false);
+        var meshFilter = prevStateVis.AddComponent<MeshFilter>();
+        meshFilter.mesh = _mesh;
+        var meshRenderer = prevStateVis.AddComponent<MeshRenderer>();
+        meshRenderer.materials = Enumerable.Range(0, _mesh.subMeshCount).Select(i => placeholderMaterial).ToArray();
 
         var rigidbody = _instance.AddComponent<Rigidbody>();
         rigidbody.useGravity = false;
