@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Linq;
+using AsImpL;
 using Assets.Scripts.Api.Models;
-using Dummiesman;
 using Oculus.Interaction;
 using Oculus.Interaction.DistanceReticles;
 using Oculus.Interaction.Grab;
@@ -69,8 +69,23 @@ public class ObjectController : MonoBehaviour
         yield return StartCoroutine(apiClient.DownloadModel(obj.Model, res => modelPath = res, err => Debug.Log(err)));
         if (modelPath == null) yield break;
 
-        var model = new OBJLoader().Load(modelPath);
-        model.transform.SetParent(_instance.transform, false);
+        // var model = new OBJLoader().Load(modelPath);
+        // model.transform.SetParent(_instance.transform, false);
+        var options = new ImportOptions()
+        {
+            zUp = false,
+            convertToDoubleSided = true,
+            reuseLoaded = true
+        };
+        if (obj.Movable)
+        {
+            options.buildColliders = true;
+            options.colliderConvex = true;
+            options.colliderTrigger = true;
+        }
+
+        var importer = gameObject.AddComponent<ObjectImporter>();
+        yield return importer.ImportModelAsync(o.Model.Name, modelPath, _instance.transform, options);
 
         if (obj.Movable) EnableInteraction();
         if (_placeholder != null) Destroy(_placeholder);
@@ -78,19 +93,20 @@ public class ObjectController : MonoBehaviour
 
     public void EnableInteraction()
     {
-        var meshes = _instance.GetComponentsInChildren<MeshFilter>();
-        var combine = meshes.Select(mesh => new CombineInstance()
-        {
-            mesh = mesh.sharedMesh,
-            transform = _instance.transform.worldToLocalMatrix * mesh.transform.localToWorldMatrix
-        }).ToArray();
-        _mesh = new Mesh();
-        _mesh.CombineMeshes(combine);
+        // var meshes = _instance.GetComponentsInChildren<MeshFilter>();
+        // var combine = meshes.Select(mesh => new CombineInstance()
+        // {
+        //     mesh = mesh.sharedMesh,
+        //     transform = _instance.transform.worldToLocalMatrix * mesh.transform.localToWorldMatrix
+        // }).ToArray();
+        // _mesh = new Mesh();
+        // _mesh.CombineMeshes(combine);
+        _mesh = _instance.GetComponentInChildren<MeshFilter>().mesh;
         _prevState.GetComponentInChildren<MeshFilter>().mesh = _mesh;
 
-        var collider = _instance.AddComponent<MeshCollider>();
-        collider.sharedMesh = _mesh;
-        collider.convex = true;
+        // var collider = _instance.AddComponent<MeshCollider>();
+        // collider.sharedMesh = _mesh;
+        // collider.convex = true;
 
         var rigidbody = _instance.AddComponent<Rigidbody>();
         rigidbody.useGravity = false;
@@ -125,7 +141,7 @@ public class ObjectController : MonoBehaviour
         disHandGrabInteractable.InjectOptionalMovementProvider(moveProvider);
 
         var reticle = _instance.AddComponent<ReticleDataIcon>();
-        reticle.InjectOptionalColliders(new Collider[] { collider });
+        reticle.InjectOptionalColliders(new Collider[] { GetComponent<Collider>() });
         grabbable.WhenPointerEventRaised += HandlePointerEvent;
     }
 
