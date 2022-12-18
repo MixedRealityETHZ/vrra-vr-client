@@ -17,6 +17,9 @@ public class ApiClient : MonoBehaviour
 
     public static string ModelCachePath = "models";
 
+    private static HashSet<int> _downloadingAssets = new HashSet<int>();
+    private static HashSet<int> _downloadingModels = new HashSet<int>();
+    
     private Uri BaseUri => new(BaseUrl);
 
     // Start is called before the first frame update
@@ -129,10 +132,15 @@ public class ApiClient : MonoBehaviour
 
     public IEnumerator DownloadAsset(int id, Action<string> accept, Action<Exception> reject)
     {
+        while(_downloadingAssets.Contains(id))
+            yield return null;
+        
+        _downloadingAssets.Add(id);
         var path = Path.Combine(Application.persistentDataPath, AssetCachePath, id.ToString());
         if (File.Exists(path))
         {
             accept(path);
+            _downloadingAssets.Remove(id);
             yield break;
         }
 
@@ -143,6 +151,7 @@ public class ApiClient : MonoBehaviour
         if (asset.Status != AssetStatus.Ready)
         {
             reject(new Exception("Asset not ready"));
+            _downloadingAssets.Remove(id);
             yield break;
         }
 
@@ -152,25 +161,35 @@ public class ApiClient : MonoBehaviour
         if (req.result != UnityWebRequest.Result.Success)
         {
             reject(new Exception(req.error));
+            _downloadingAssets.Remove(id);
             yield break;
         }
 
+        _downloadingAssets.Remove(id);
         accept(path);
     }
 
     public IEnumerator DownloadModel(Model model, Action<string> accept, Action<Exception> reject)
     {
+        while (_downloadingModels.Contains(model.Id))
+            yield return null;
+        _downloadingModels.Add(model.Id);
         var folder = Path.Combine(Application.persistentDataPath, ModelCachePath, model.Id.ToString());
         var path = Path.Combine(folder, model.Path);
         if (File.Exists(path))
         {
             accept(path);
+            _downloadingModels.Remove(model.Id);
             yield break;
         }
 
         string assetPath = null;
         yield return StartCoroutine(DownloadAsset(model.AssetId, p => assetPath = p, reject));
-        if (assetPath == null) yield break;
+        if (assetPath == null)
+        {
+            _downloadingModels.Remove(model.Id);
+            yield break;
+        }
 
         try
         {
@@ -179,9 +198,11 @@ public class ApiClient : MonoBehaviour
         catch (Exception e)
         {
             reject(e);
+            _downloadingModels.Remove(model.Id);
             yield break;
         }
 
+        _downloadingModels.Remove(model.Id);
         accept(path);
     }
 
