@@ -82,6 +82,7 @@ crashlytics-build.properties
 !/[Aa]ssets/Prefabs/
 !/[Aa]ssets/Materials/
 !/[Aa]ssets/Textures/
+!/[Aa]ssets/AsImpL/
 
 /OVRAssetBundles/
 
