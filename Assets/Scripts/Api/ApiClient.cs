@@ -171,15 +171,16 @@ public class ApiClient : MonoBehaviour
 
     public IEnumerator DownloadModel(Model model, Action<string> accept, Action<Exception> reject)
     {
-        while (_downloadingModels.Contains(model.Id))
+        var assetId = model.AssetId;
+        while (_downloadingModels.Contains(assetId))
             yield return null;
-        _downloadingModels.Add(model.Id);
-        var folder = Path.Combine(Application.persistentDataPath, ModelCachePath, model.Id.ToString());
+        _downloadingModels.Add(assetId);
+        var folder = Path.Combine(Application.persistentDataPath, ModelCachePath, assetId.ToString());
         var path = Path.Combine(folder, model.Path);
         if (File.Exists(path))
         {
             accept(path);
-            _downloadingModels.Remove(model.Id);
+            _downloadingModels.Remove(assetId);
             yield break;
         }
 
@@ -187,7 +188,7 @@ public class ApiClient : MonoBehaviour
         yield return StartCoroutine(DownloadAsset(model.AssetId, p => assetPath = p, reject));
         if (assetPath == null)
         {
-            _downloadingModels.Remove(model.Id);
+            _downloadingModels.Remove(assetId);
             yield break;
         }
 
@@ -198,11 +199,11 @@ public class ApiClient : MonoBehaviour
         catch (Exception e)
         {
             reject(e);
-            _downloadingModels.Remove(model.Id);
+            _downloadingModels.Remove(assetId);
             yield break;
         }
 
-        _downloadingModels.Remove(model.Id);
+        _downloadingModels.Remove(assetId);
         accept(path);
     }
 
