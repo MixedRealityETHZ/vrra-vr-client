@@ -9,7 +9,8 @@ public class MenuPose : MonoBehaviour
     [SerializeField] private ActiveStateSelector[] _poses;
     [SerializeField] private GameObject _menu;
     [SerializeField] private float _distance = .08f;
-    [SerializeField] private float _offset = .1f;
+    [SerializeField] private float _offsetRight = .1f;
+    [SerializeField] private float _offsetForward = -.12f;
     [SerializeField] private float _closeDelay = 1f;
 
     private HandRef _handAnchor = null;
@@ -59,8 +60,9 @@ public class MenuPose : MonoBehaviour
         _handAnchor.GetRootPose(out Pose wristPose);
         var up = _handAnchor.Handedness == Handedness.Left ? wristPose.up : -wristPose.up;
         var right = _handAnchor.Handedness == Handedness.Left ? wristPose.right : -wristPose.right;
-
-        _menu.transform.position = wristPose.position + _distance * up + _offset * right;
+        var forward = _handAnchor.Handedness == Handedness.Left ? wristPose.forward : -wristPose.forward;
+        
+        _menu.transform.position = wristPose.position + _distance * up + _offsetForward * forward + _offsetRight * right;
         _menu.transform.rotation = Quaternion.LookRotation(-up);
     }
 }
