@@ -164,18 +164,24 @@ public class ObjectController : MonoBehaviour
         switch (e.Type)
         {
             case PointerEventType.Hover:
-                if (!_deleteMode) break;
-                deleted = !deleted;
-                if (deleted) Freeze();
-                else Unfreeze();
                 break;
             case PointerEventType.Unhover:
                 break;
             case PointerEventType.Select:
-                _prevState.transform.position = _instance.transform.position;
-                _prevState.transform.rotation = _instance.transform.rotation;
-                _prevState.transform.localScale = _instance.transform.localScale;
-                _prevState.SetActive(true);
+                if (_deleteMode)
+                {
+                    deleted = !deleted;
+                    if (deleted) Freeze();
+                    else Unfreeze();
+                }
+                else
+                {
+                    _prevState.transform.position = _instance.transform.position;
+                    _prevState.transform.rotation = _instance.transform.rotation;
+                    _prevState.transform.localScale = _instance.transform.localScale;
+                    _prevState.SetActive(true);
+                }
+
                 break;
             case PointerEventType.Unselect:
                 var body = new AddObjBody()

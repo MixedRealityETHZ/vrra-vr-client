@@ -9,7 +9,6 @@ public class RoomController : MonoBehaviour
     public ApiClient apiClient;
     public GameObject placeholderPrefab;
     public Material placeholderMaterial;
-    public List<ObjectController> objControllers = new();
 
     void Start()
     {
@@ -28,12 +27,10 @@ public class RoomController : MonoBehaviour
 
     private void RemoveAllObjects()
     {
-        foreach (var objController in objControllers)
+        foreach (var objController in GetComponentsInChildren<ObjectController>())
         {
             Destroy(objController.gameObject);
         }
-
-        objControllers.Clear();
     }
 
     private IEnumerator LoadObjects()
@@ -87,17 +84,17 @@ public class RoomController : MonoBehaviour
     ObjectController AddObjectController(Obj obj)
     {
         var instance = new GameObject(obj.Model.Name);
+        instance.transform.parent = transform;
         var ctrl = instance.AddComponent<ObjectController>();
         ctrl.apiClient = apiClient;
         ctrl.placeholderPrefab = placeholderPrefab;
         ctrl.placeholderMaterial = placeholderMaterial;
-        objControllers.Add(ctrl);
         return ctrl;
     }
 
     public void EnableDeleteMode()
     {
-        foreach (var objController in objControllers)
+        foreach (var objController in GetComponentsInChildren<ObjectController>())
         {
             objController.EnableDeleteMode();
         }
@@ -105,7 +102,7 @@ public class RoomController : MonoBehaviour
 
     public void CancelDelete()
     {
-        foreach (var objController in objControllers)
+        foreach (var objController in  GetComponentsInChildren<ObjectController>())
         {
             objController.DisableDeleteMode();
         }
@@ -123,11 +120,11 @@ public class RoomController : MonoBehaviour
 
     public void ConfirmDelete()
     {
+
+        var objControllers = GetComponentsInChildren<ObjectController>();
         foreach (var objController in objControllers.Where(objController => objController.deleted))
         {
             DeleteObject(objController);
         }
-
-        objControllers.RemoveAll(objController => objController.deleted);
     }
 }
