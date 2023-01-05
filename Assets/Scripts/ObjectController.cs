@@ -159,6 +159,13 @@ public class ObjectController : MonoBehaviour
         Unfreeze();
     }
 
+    public void UpdateInstance()
+    {
+        _instance.transform.position = obj.Translation;
+        _instance.transform.rotation = obj.Rotation;
+        _instance.transform.localScale = obj.Scale;
+    }
+
     private void HandlePointerEvent(PointerEvent e)
     {
         switch (e.Type)
