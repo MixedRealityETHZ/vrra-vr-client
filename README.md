@@ -2,12 +2,7 @@
 
 Welcome to the repository of the VR client of the project ["3D Room Arrangements using Virtual Reality"](https://github.com/MixedRealityETHZ/3d-vr-room-arrangements). The VR client is built with Unity and Oculus Integration SDK. It allows multiple users to rearrange objects in a virtual room using gestures, add new objects from CAD model datasets, and remove unwanted objects. All objects are fetched from the backend server and synchronized with the server in real-time.
 
-<img src="images/select-room.png" width="30%"/>
-<img src="images/one-hand.png" width="30%"/>
-<img src="images/move.png" width="30%"/>
-<img src="images/menu.png" width="30%"/>
-<img src="images/obj-store.png" width="30%"/>
-<img src="images/delete.png" width="30%"/>
+<img src="images/select-room.png" width="32%"/>&nbsp;<img src="images/one-hand.png" width="32%"/>&nbsp;<img src="images/move.png" width="32%"/><br/><img src="images/menu.png" width="32%"/>&nbsp;<img src="images/obj-store.png" width="32%"/>&nbsp;<img src="images/delete.png" width="32%"/>
 
 ---
 
